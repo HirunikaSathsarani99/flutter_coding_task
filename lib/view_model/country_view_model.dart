@@ -2,18 +2,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_coding_task/model/country_model.dart';
 import 'package:flutter_coding_task/service/api_service.dart';
 
-enum ViewState { idle, loading, error }
+enum ViewState { init, loading,loaded, error }
 
 
 class CountryViewModel with ChangeNotifier{
-  List<Country> _countries = [];
-  List<Country> get countries => _countries;
+  List<Country> countriesList = [];
+  List<Country> get countries => countriesList;
 
   String _sortCriteria = 'name';
   String get sortCriteria => _sortCriteria;
 
   final ApiClient apiClient;
-  ViewState _state = ViewState.idle;
+  ViewState _state = ViewState.init;
   ViewState get state => _state;
 
   CountryViewModel(this.apiClient);
@@ -24,9 +24,10 @@ class CountryViewModel with ChangeNotifier{
 
     try {
       final countries = await apiClient.getEuropeanCountries();
-      _countries = countries;
-      _sortCountries();
-      _state = ViewState.idle;
+      countriesList = countries;
+      sortCountries();
+      _state = ViewState.loaded;
+      print('Country list is  loaded');
     } catch (e) {
       _state = ViewState.error;
       print('Failed to fetch countries: $e');
@@ -37,21 +38,21 @@ class CountryViewModel with ChangeNotifier{
 
   void setSortCriteria(String criteria) {
     _sortCriteria = criteria;
-    _sortCountries();
+    sortCountries();
     notifyListeners();
   }
 
-  void _sortCountries() {
-    if (_countries.isNotEmpty) {
+  void sortCountries() {
+    if (countriesList.isNotEmpty) {
       switch (_sortCriteria) {
         case 'population':
-          _countries.sort((a, b) => a.population.compareTo(b.population));
+          countriesList.sort((a, b) => a.population.compareTo(b.population));
           break;
         case 'capital':
-          _countries.sort((a, b) => a.capital.first.compareTo(b.capital.first));
+          countriesList.sort((a, b) => a.capital.first.compareTo(b.capital.first));
           break;
         default:
-          _countries.sort((a, b) => a.name.common.compareTo(b.name.common));
+          countriesList.sort((a, b) => a.name.common.compareTo(b.name.common));
           break;
       }
     }
