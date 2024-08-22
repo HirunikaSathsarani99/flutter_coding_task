@@ -18,6 +18,8 @@ class CountryViewModel with ChangeNotifier{
 
   CountryViewModel(this.apiClient);
 
+  //fetch data
+
   Future<void> fetchCountries() async {
     _state = ViewState.loading;
     notifyListeners();
